@@ -276,6 +276,75 @@ ID sent to the provider.
 
 See [Models](/models) for selection, defaults, capabilities, limits, costs, and variants.
 
+## NVIDIA
+
+Create an API key at [build.nvidia.com](https://build.nvidia.com), then add
+[Nemotron 3.5 Super VL 120B A12B](https://build.nvidia.com/nvidia/nemotron-3.5-super-vl-120b-a12b) to your configuration.
+NVIDIA uses the OpenAI-compatible runtime.
+
+```jsonc title="opencode.jsonc"
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b",
+  "providers": {
+    "nvidia": {
+      "name": "NVIDIA",
+      "env": ["NVIDIA_API_KEY"],
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://integrate.api.nvidia.com/v1",
+      },
+      "models": {
+        "nvidia/nemotron-3.5-super-vl-120b-a12b": {
+          "name": "Nemotron 3.5 Super VL 120B A12B",
+          "capabilities": {
+            "input": ["text", "image"],
+            "output": ["text"],
+          },
+          "settings": {
+            "reasoningEffort": "high",
+          },
+          "variants": [
+            { "id": "minimal", "settings": { "reasoningEffort": "minimal" } },
+            { "id": "low", "settings": { "reasoningEffort": "low" } },
+            { "id": "medium", "settings": { "reasoningEffort": "medium" } },
+            { "id": "high", "settings": { "reasoningEffort": "high" } },
+            { "id": "xhigh", "settings": { "reasoningEffort": "xhigh" } },
+            { "id": "max", "settings": { "reasoningEffort": "max" } },
+            { "id": "none", "settings": { "reasoningEffort": "none" } },
+          ],
+        },
+      },
+    },
+  },
+}
+```
+
+Run `/connect`, select **NVIDIA**, and paste your API key. You can also supply the key through `NVIDIA_API_KEY`.
+Run `/models` to select **Nemotron 3.5 Super VL 120B A12B**.
+
+```text
+/connect
+# Select NVIDIA, then paste your API key.
+/models
+# Select Nemotron 3.5 Super VL 120B A12B.
+```
+
+### Reasoning
+
+The example defaults to `high` reasoning through the model's `settings.reasoningEffort`. Select a
+[variant](/models#variants) to change the effort for a run or session; `none` explicitly turns reasoning off.
+
+```bash
+opencode run --model nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b "Review this migration plan"
+opencode run --model nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b#max "Review this migration plan"
+opencode run --model nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b#none "Summarize this file"
+```
+
+The root `model` setting does not retain a variant, so set the default effort on the model itself instead of adding
+`#high` to that setting. A variant already selected for a session takes precedence; choose **default** to use the
+model's configured `high` effort again.
+
 ## Azure
 
 Azure's standard catalog endpoint needs a resource name in addition to its credential. Set `settings.resourceName`
